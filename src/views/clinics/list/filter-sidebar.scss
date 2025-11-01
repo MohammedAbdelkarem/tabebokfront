@@ -1,0 +1,302 @@
+/* Filter Sidebar Styles */
+.filter-sidebar {
+  position: sticky;
+  top: 20px;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  border: 1px solid #e9ecef;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  
+  .card-body {
+    padding: 1.5rem;
+  }
+  
+  .card-title {
+    color: #495057;
+    font-weight: 600;
+    border-bottom: 2px solid #1fa2ff;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  /* Form Groups */
+  .form-group {
+    .form-label {
+      color: #495057;
+      font-size: 0.875rem;
+      margin-bottom: 0.5rem;
+    }
+  }
+  
+  /* Search Input */
+  .position-relative {
+    .form-control {
+      border-radius: 8px;
+      border: 1px solid #d8d6de;
+      padding-left: 2.5rem;
+      
+      &:focus {
+        border-color: #1fa2ff;
+        box-shadow: 0 0 0 0.2rem rgba(70, 131, 134, 0.25);
+      }
+    }
+  }
+  
+  /* Collapsible Sections */
+  .cursor-pointer {
+    cursor: pointer;
+    transition: all 0.2s ease;
+    
+    &:hover {
+      background-color: #f8f9fa !important;
+    }
+  }
+  
+  /* Form Checks */
+  .form-check {
+    padding-left: 1.5rem;
+    
+    .form-check-input {
+      margin-top: 0.125rem;
+      
+      &:checked {
+        background-color: #1fa2ff;
+        border-color: #1fa2ff;
+      }
+      
+      &:focus {
+        box-shadow: 0 0 0 0.2rem rgba(70, 131, 134, 0.25);
+      }
+    }
+    
+    .form-check-label {
+      font-size: 0.875rem;
+      color: #495057;
+      cursor: pointer;
+      
+      &:hover {
+        color: #1fa2ff;
+      }
+    }
+  }
+  
+  /* Radio Buttons */
+  input[type="radio"] {
+    &:checked {
+      background-color: #1fa2ff;
+      border-color: #1fa2ff;
+    }
+  }
+  
+  /* Checkboxes */
+  input[type="checkbox"] {
+    &:checked {
+      background-color: #1fa2ff;
+      border-color: #1fa2ff;
+    }
+  }
+  
+  /* Select Component */
+  .react-select {
+    .select__control {
+      border-radius: 8px;
+      border: 1px solid #d8d6de;
+      min-height: 38px;
+      
+      &:hover {
+        border-color: #1fa2ff;
+      }
+      
+      &.select__control--is-focused {
+        border-color: #1fa2ff;
+        box-shadow: 0 0 0 0.2rem rgba(70, 131, 134, 0.25);
+      }
+    }
+    
+    .select__multi-value {
+      background-color: rgba(70, 131, 134, 0.1);
+      
+      .select__multi-value__label {
+        color: #1fa2ff;
+        font-weight: 500;
+      }
+      
+      .select__multi-value__remove {
+        color: #1fa2ff;
+        
+        &:hover {
+          background-color: #1fa2ff;
+          color: white;
+        }
+      }
+    }
+    
+    .select__option {
+      &.select__option--is-selected {
+        background-color: #1fa2ff;
+      }
+      
+      &.select__option--is-focused {
+        background-color: rgba(70, 131, 134, 0.1);
+        color: #1fa2ff;
+      }
+    }
+  }
+  
+  /* Action Buttons */
+  .btn {
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    
+    &.btn-primary {
+      background-color: #1fa2ff;
+      border-color: #1fa2ff;
+      
+      &:hover {
+        background-color: #3a6d70;
+        border-color: #3a6d70;
+        transform: translateY(-1px);
+      }
+      
+      &:focus {
+        box-shadow: 0 0 0 0.2rem rgba(70, 131, 134, 0.25);
+      }
+    }
+    
+    &.btn-secondary {
+      &:hover {
+        transform: translateY(-1px);
+      }
+    }
+  }
+  
+  /* Badge */
+  .badge {
+    &.bg-primary {
+      background-color: #1fa2ff !important;
+    }
+  }
+  
+  /* Collapse Animation */
+  .collapse {
+    transition: height 0.3s ease;
+  }
+  
+  /* Loading States */
+  .spinner-border-sm {
+    color: #1fa2ff;
+  }
+  
+  /* Scrollbar */
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+    
+    &:hover {
+      background: #a8a8a8;
+    }
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .filter-sidebar {
+    position: relative;
+    top: 0;
+    max-height: none;
+    margin-bottom: 1rem;
+    
+    .card-body {
+      padding: 1rem;
+    }
+    
+    .form-check {
+      padding-left: 1.25rem;
+    }
+    
+    .btn {
+      font-size: 0.875rem;
+      padding: 0.5rem 1rem;
+    }
+  }
+}
+
+/* Animation for filter count badge */
+@keyframes badgeAppear {
+  from {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.badge {
+  animation: badgeAppear 0.3s ease-out;
+}
+
+/* Hover effects for collapsible sections */
+.bg-light {
+  transition: background-color 0.2s ease;
+  border-radius: 6px !important;
+}
+
+/* Form validation styles */
+.form-control {
+  &.is-invalid {
+    border-color: #dc3545;
+    
+    &:focus {
+      border-color: #dc3545;
+      box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+    }
+  }
+  
+  &.is-valid {
+    border-color: #1fa2ff;
+    
+    &:focus {
+      border-color: #1fa2ff;
+      box-shadow: 0 0 0 0.2rem rgba(70, 131, 134, 0.25);
+    }
+  }
+}
+
+/* Enhanced visual feedback */
+.form-check-input {
+  &:hover {
+    transform: scale(1.1);
+    transition: transform 0.1s ease;
+  }
+}
+
+/* Section dividers */
+.mb-3:not(:last-child) {
+  border-bottom: 1px solid #f8f9fa;
+  padding-bottom: 1rem;
+}
+
+/* Icon styling */
+.text-primary {
+  color: #1fa2ff !important;
+}
+
+.text-success {
+  color: #1fa2ff !important;
+}
+
+.text-info {
+  color: #1fa2ff !important;
+}

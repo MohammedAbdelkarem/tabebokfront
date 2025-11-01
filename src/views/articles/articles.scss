@@ -1,0 +1,512 @@
+/* Articles Pinterest-Style Layout */
+.articles-container {
+  padding: 2rem 1rem;
+  min-height: 100vh;
+
+  .articles-header {
+    text-align: center;
+    margin-bottom: 3rem;
+
+    .page-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #1fa2ff;
+      margin-bottom: 0.5rem;
+    }
+
+    .page-subtitle {
+      font-size: 1.1rem;
+      color: #6c757d;
+      margin-bottom: 0;
+    }
+  }
+
+  /* Pinterest Grid Layout */
+  .pinterest-grid {
+    columns: 4;
+    column-gap: 1.5rem;
+    column-fill: balance;
+
+    /* When filters are shown, use 3 columns for larger cards */
+    &.with-filters {
+      columns: 3;
+      column-gap: 2rem;
+
+      @media (max-width: 1200px) {
+        columns: 2;
+      }
+
+      @media (max-width: 768px) {
+        columns: 1;
+        column-gap: 1rem;
+      }
+    }
+
+    @media (max-width: 1200px) {
+      columns: 3;
+    }
+
+    @media (max-width: 768px) {
+      columns: 2;
+      column-gap: 1rem;
+    }
+
+    @media (max-width: 480px) {
+      columns: 1;
+    }
+  }
+
+  .pinterest-item {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    margin-bottom: 1.5rem;
+    display: block;
+    width: 100%;
+  }
+
+  /* Article Card Styling */
+  .article-card {
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+    background: white;
+    
+    &:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+      
+      .article-image {
+        transform: scale(1.05);
+      }
+      
+      .media-overlay {
+        opacity: 1;
+      }
+    }
+  }
+
+  /* Article Media Container */
+  .article-media-container {
+    position: relative;
+    overflow: hidden;
+    border-radius: 16px 16px 0 0;
+
+    .media-carousel {
+      position: relative;
+      width: 100%;
+      height: auto;
+
+      .media-slide {
+        position: relative;
+
+        .article-media {
+          width: 100%;
+          height: 250px;
+          object-fit: cover;
+          transition: transform 0.3s ease;
+          display: block;
+        }
+
+        .video-container {
+          position: relative;
+
+          video {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+          }
+
+          .media-type-icon {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 0.5rem;
+            border-radius: 50%;
+            backdrop-filter: blur(10px);
+            pointer-events: none;
+
+            .media-icon {
+              display: block;
+            }
+          }
+        }
+      }
+
+      // Navigation Arrows
+      .carousel-btn {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(255, 255, 255, 0.9);
+        border: none;
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        color: #1fa2ff;
+        font-size: 18px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        z-index: 10;
+        backdrop-filter: blur(10px);
+
+        &:hover {
+          background: rgba(255, 255, 255, 1);
+          transform: translateY(-50%) scale(1.1);
+        }
+
+        &.carousel-prev {
+          left: 10px;
+        }
+
+        &.carousel-next {
+          right: 10px;
+        }
+      }
+
+      // Pagination Dots
+      .carousel-pagination {
+        position: absolute;
+        bottom: 1rem;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 8px;
+        z-index: 10;
+
+        .pagination-dot {
+          width: 5px;
+          height: 5px;
+          border-radius: 50%;
+          border: none;
+          background: rgba(255, 255, 255, 0.7);
+          cursor: pointer;
+          transition: all 0.3s ease;
+
+          &.active {
+            background: #1fa2ff;
+            transform: scale(1.2);
+          }
+
+          &:hover {
+            background: rgba(255, 255, 255, 0.9);
+          }
+        }
+      }
+    }
+
+    // Media Count Badge
+    .media-count-badge {
+      position: absolute;
+      top: 1rem;
+      left: 1rem;
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      padding: 0.25rem 0.5rem;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      backdrop-filter: blur(10px);
+      z-index: 10;
+
+      span {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+
+        &:before {
+          content: "📷";
+          font-size: 0.7rem;
+        }
+      }
+    }
+
+    .media-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+      padding: 2rem 1rem 1rem;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      z-index: 5;
+
+      .overlay-stats {
+        display: flex;
+        gap: 1rem;
+
+        .stat-item {
+          display: flex;
+          align-items: center;
+          gap: 0.25rem;
+          color: white;
+          font-size: 0.875rem;
+          font-weight: 500;
+
+          svg {
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+          }
+        }
+      }
+    }
+
+    &:hover {
+      .article-media {
+        transform: scale(1.05);
+      }
+
+      .media-overlay {
+        opacity: 1;
+      }
+    }
+  }
+
+  /* Article Content */
+  .article-content {
+    padding: 1.5rem;
+    
+    .article-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #1fa2ff;
+      line-height: 1.4;
+      margin-bottom: 1rem;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    
+    .article-body {
+      color: #6c757d;
+      font-size: 0.9rem;
+      line-height: 1.6;
+
+      p {
+        margin-bottom: 0.5rem;
+      }
+
+      .read-more-btn {
+        background: none;
+        border: none;
+        color: #1fa2ff;
+        font-size: inherit;
+        font-weight: 500;
+        cursor: pointer;
+        padding: 0;
+        margin: 0;
+        text-decoration: none;
+        transition: color 0.2s ease;
+        display: inline;
+        vertical-align: baseline;
+        line-height: inherit;
+
+        &:hover {
+          color: darken(#1fa2ff, 10%);
+          text-decoration: underline;
+        }
+
+        &:focus {
+          outline: none;
+          color: darken(#1fa2ff, 15%);
+        }
+      }
+    }
+  }
+
+  /* Article Stats */
+  .article-stats {
+    .stats-container {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 0.75rem 0;
+      border-top: 1px solid #f1f3f4;
+      border-bottom: 1px solid #f1f3f4;
+      background: rgba(248, 249, 250, 0.5);
+      border-radius: 8px;
+
+      .stat-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.25rem;
+        flex: 1;
+        cursor: pointer;
+        padding: 0.5rem;
+        border-radius: 6px;
+        transition: all 0.2s ease;
+
+        &:hover {
+          background: rgba(70, 131, 134, 0.1);
+          transform: translateY(-1px);
+
+          .stat-icon svg {
+            transform: scale(1.1);
+          }
+        }
+
+        .stat-icon {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          background: rgba(255, 255, 255, 0.8);
+          margin-bottom: 0.25rem;
+          transition: all 0.2s ease;
+
+          svg {
+            transition: all 0.2s ease;
+          }
+        }
+
+        .stat-value {
+          font-size: 0.875rem;
+          font-weight: 600;
+          color: #2c3e50;
+          line-height: 1;
+        }
+
+        .stat-label {
+          font-size: 0.7rem;
+          color: #6c757d;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          font-weight: 500;
+          line-height: 1;
+        }
+
+        // Specific hover colors for different stats
+        &:hover {
+          .stat-icon svg.text-danger {
+            color: #e74c3c !important;
+          }
+
+          .stat-icon svg.text-primary {
+            color: #3498db !important;
+          }
+
+          .stat-icon svg.text-muted {
+            color: #1fa2ff !important;
+          }
+        }
+      }
+    }
+  }
+
+  /* Article Footer */
+  .article-footer {
+    border-top: 1px solid #f8f9fa;
+    padding-top: 1rem;
+    
+    .article-date {
+      display: flex;
+      align-items: center;
+      font-size: 0.8rem;
+    }
+    
+    .article-badge {
+      font-size: 0.75rem;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-weight: 500;
+    }
+  }
+
+  /* Loading States */
+  .text-center {
+    .spinner-border {
+      width: 2rem;
+      height: 2rem;
+    }
+  }
+
+  /* Empty State */
+  .text-muted {
+    svg {
+      opacity: 0.5;
+    }
+  }
+
+  /* Animations */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .pinterest-item {
+    animation: fadeInUp 0.6s ease-out;
+    animation-fill-mode: both;
+    
+    @for $i from 1 through 12 {
+      &:nth-child(#{$i}) {
+        animation-delay: #{$i * 0.1}s;
+      }
+    }
+  }
+
+  /* Hover Effects */
+  .article-card {
+    .article-title {
+      transition: color 0.2s ease;
+    }
+    
+    &:hover .article-title {
+      color: #1fa2ff;
+    }
+  }
+
+  /* Responsive Adjustments */
+  @media (max-width: 768px) {
+    padding: 1rem 0.5rem;
+    
+    .articles-header {
+      margin-bottom: 2rem;
+      
+      .page-title {
+        font-size: 2rem;
+      }
+      
+      .page-subtitle {
+        font-size: 1rem;
+      }
+    }
+    
+    .article-content {
+      padding: 1rem;
+      
+      .article-title {
+        font-size: 1.1rem;
+      }
+      
+      .article-body {
+        font-size: 0.85rem;
+      }
+    }
+    
+    .article-stats {
+      .stat-group {
+        gap: 0.75rem;
+        
+        .stat-item {
+          font-size: 0.8rem;
+        }
+      }
+    }
+  }
+
+
+}

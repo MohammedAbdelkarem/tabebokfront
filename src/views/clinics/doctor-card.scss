@@ -1,0 +1,49 @@
+/* Doctor Card Styles - Organized Version */
+.doctor-card {
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  height: 350px; /* Increased height to accommodate more content */
+  
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+  }
+  
+  .card-img-top {
+    border-radius: 12px 12px 0 0;
+    height: 150px !important;
+  }
+  
+  
+  .card-body {
+    padding: 0.75rem !important;
+    background: #ffffff;
+    height: 160px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.doctor-card {
+  animation: fadeInUp 0.5s ease-out;
+}
+
+/* Staggered animation for multiple cards */
+.doctor-card:nth-child(1) { animation-delay: 0.1s; }
+.doctor-card:nth-child(2) { animation-delay: 0.2s; }
+.doctor-card:nth-child(3) { animation-delay: 0.3s; }
