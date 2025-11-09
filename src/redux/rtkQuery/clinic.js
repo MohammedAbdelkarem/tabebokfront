@@ -23,8 +23,15 @@ export const clinicSlice = createApi({
         url: `/doctors/rate/delete/${id}`,
         method: "DELETE"
       })
+    }),
+    register: builder.mutation({
+      query: ({ body }) => ({
+        url: `/register/doctor`,
+        body,
+        method: "POST"
+      })
     })
   })
 })
 
-export const { useListMutation, useShowMutation, useRemoveRateMutation } = clinicSlice
+export const { useListMutation, useShowMutation, useRemoveRateMutation, useRegisterMutation } = clinicSlice
