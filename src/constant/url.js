@@ -1,4 +1,5 @@
-export const base_url = 'https://testabebok.auraxis-co.com'
+// export const base_url = 'https://testabebok.auraxis-co.com'
+export const base_url = 'https://api.tabebok-sy.com.com'
 
 export const dashboard_url = `${base_url}/api`
 export const admin_url = `${dashboard_url}/admin`
