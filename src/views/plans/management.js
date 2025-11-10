@@ -411,7 +411,7 @@ const PlanForm = () => {
                         t("Submit")
                       )}
                     </Button>
-                    <Button color="secondary" outline>
+                    <Button color="secondary" outline onClick={() => navigate(-1)}>
                       {t("Discard")}
                     </Button>
                   </Col>
