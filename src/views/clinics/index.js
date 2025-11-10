@@ -3,21 +3,21 @@ import { Fragment, useEffect, useState } from "react"
 
 // ** Roles Components
 import ClinicsCard from "./card"
-import useHeaders from "../../utility/hooks/useHeaders"
 import EmptyComponent from "../components/empty"
 import { useTranslation } from "react-i18next"
 import LoadSpinner from "../../@core/components/spinner/loaders"
 import { useListMutation } from "../../redux/rtkQuery/clinic"
-import { Col, Row } from "reactstrap"
+import { Button, Col, Row } from "reactstrap"
 import FilterSidebar from "./list/FilterSidebar"
+import { Plus } from "react-feather"
+import { useNavigate } from "react-router-dom"
 
 const Clinics = () => {
-  const headers = useHeaders()
   const { t } = useTranslation()
+  const navigate = useNavigate()
   // ** State
   const [clinics, setClinics] = useState([])
   const [isFetching, setIsFetching] = useState(false)
-  const [filtersArr, setFiltersArr] = useState([])
 
   // ** Methods
   const [get, { isLoading }] = useListMutation()
@@ -31,8 +31,6 @@ const Clinics = () => {
     is_center: 0,
     phone_number: ''
   })
-  const [loading, setLoading] = useState(false)
-
   // ** RTK Query Hook (uncomment when you have the clinics API)
   // const [getClinics, { isLoading }] = useListMutation()
 
@@ -70,7 +68,6 @@ const Clinics = () => {
 
   // ** Fetch Clinics
   const fetchClinics = async (filterData = filters) => {
-    setLoading(true)
     try {
       const queryString = buildFilterQuery(filterData)
       console.log('Filter Query:', queryString)
@@ -82,7 +79,6 @@ const Clinics = () => {
   
     } catch (error) {
       console.error('Error fetching clinics:', error)
-      setLoading(false)
     }
   }
 
@@ -123,9 +119,16 @@ const Clinics = () => {
           <h3>{t("Clinics management")}</h3>
           <p className="mb-0">
             {t(
-              "Here is a list of clinics within Hospital Foundation, which you can manage simply through this page."
+              "Here is a list of clinics within Tabibok, which you can manage simply through this page."
             )}
           </p>
+        </div>
+
+        <div>
+          <Button color={'primary'} onClick={() => navigate('/clinics/management') }>
+            <Plus size='16'/>
+            {t("Add")}
+          </Button>
         </div>
       </div>
       <Row>

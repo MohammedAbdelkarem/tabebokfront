@@ -108,21 +108,12 @@ const Login = () => {
     }
     
     if (status === 'rejected') {
-      if (error?.status === 400) {
           ErrorAlert({
             title: 'Login Failed!',
             body: error?.data?.message,
             button: t("Done")
           })
         }
-     }
-     if (error?.status === 500) {
-      ErrorAlert({
-        title: 'Login Failed!',
-        body:'كلمة المرور غير صحيحة',
-        button: "Done"
-      })
-    }
   }, [status, authData])
 
   useMemo(() => {

@@ -143,15 +143,17 @@ const PlanForm = () => {
         payload.append("price", formData.price)
       }
       payload.append("number_of_days", formData.number_of_days)
-      payload.append("discount_percentage", formData.discount_percentage)
-      payload.append(
-        "discount_start_at",
-        formatDateTo24Hour(formData.discount_start_at)
-      )
-      payload.append(
-        "discount_end_at",
-        formatDateTo24Hour(formData.discount_end_at)
-      )
+      if (formData?.is_discount) {
+        payload.append("discount_percentage", formData.discount_percentage)
+        payload.append(
+          "discount_start_at",
+          formatDateTo24Hour(formData.discount_start_at)
+        )
+        payload.append(
+          "discount_end_at",
+          formatDateTo24Hour(formData.discount_end_at)
+        )
+      }
 
       update({ body: payload, id: state.id })
     } else {
@@ -165,15 +167,17 @@ const PlanForm = () => {
         payload.append("price", formData.price)
       }
       payload.append("number_of_days", formData.number_of_days)
-      payload.append("discount_percentage", formData.discount_percentage)
-      payload.append(
-        "discount_start_at",
-        formatDateTo24Hour(formData.discount_start_at)
-      )
-      payload.append(
-        "discount_end_at",
-        formatDateTo24Hour(formData.discount_end_at)
-      )
+      if (formData?.is_discount) {
+        payload.append("discount_percentage", formData.discount_percentage)
+        payload.append(
+          "discount_start_at",
+          formatDateTo24Hour(formData.discount_start_at)
+        )
+        payload.append(
+          "discount_end_at",
+          formatDateTo24Hour(formData.discount_end_at)
+        )
+      }
 
       store({ body: payload })
     }
@@ -407,7 +411,7 @@ const PlanForm = () => {
                         t("Submit")
                       )}
                     </Button>
-                    <Button color="secondary" outline>
+                    <Button color="secondary" outline onClick={() => navigate(-1)}>
                       {t("Discard")}
                     </Button>
                   </Col>

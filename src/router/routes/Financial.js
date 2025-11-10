@@ -14,7 +14,6 @@ const FinancialRoutes = [
     element: <PlanSubscriptions />,
     path: '/plan-subscriptions/:name'
   },
-  
   {
     element: <PlanForm />,
     path: '/plans/management'

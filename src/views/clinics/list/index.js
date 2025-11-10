@@ -11,7 +11,6 @@ import FilterSidebar from './FilterSidebar'
 import { useTranslation } from 'react-i18next'
 
 // ** Redux (assuming you have a clinics slice)
-// import { useListMutation } from '@src/redux/rtkQuery/clinic'
 
 // ** Styles
 import './filter-sidebar.scss'
@@ -32,7 +31,6 @@ const ClinicsList = () => {
   const [loading, setLoading] = useState(false)
 
   // ** RTK Query Hook (uncomment when you have the clinics API)
-  // const [getClinics, { isLoading }] = useListMutation()
 
   // ** Build Filter Query String
   const buildFilterQuery = (filterData) => {
@@ -124,9 +122,6 @@ const ClinicsList = () => {
   return (
     <Fragment>
       <Row>
-        {/* Filter Sidebar */}
-      
-        {/* Clinics List */}
         <Col lg={9} md={8} sm={12}>
           <Card>
             <CardBody>
@@ -145,7 +140,6 @@ const ClinicsList = () => {
                         <CardBody>
                           <h6>{clinic.name}</h6>
                           <p className='text-muted'>{clinic.city}</p>
-                          {/* Add more clinic details here */}
                         </CardBody>
                       </Card>
                     </Col>
