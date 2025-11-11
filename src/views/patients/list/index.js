@@ -7,9 +7,17 @@ import Table from './Table'
 import '@styles/react/apps/app-users.scss'
 import LoadSpinner from '../../../@core/components/spinner/loaders'
 import { useTranslation } from 'react-i18next'
+import { useOverviewMutation } from '../../../redux/rtkQuery/admin'
+import useHeaders from '@hooks/useHeaders'
 const UsersList = () => {
+  const headers = useHeaders()
   const {t} = useTranslation()
-  const [getUsers, {data, isLoading}] = useListMutation()  
+  const [getUsers, {data, isLoading}] = useListMutation() 
+  const [overview] = useOverviewMutation()
+
+  useEffect(() => {
+    overview({headers})
+  }, []) 
   useEffect(() => { getUsers() }, [])
     return (
       <div className='app-user-list'>

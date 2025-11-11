@@ -11,10 +11,15 @@ import { Button, Col, Row } from "reactstrap"
 import FilterSidebar from "./list/FilterSidebar"
 import { Plus } from "react-feather"
 import { useNavigate } from "react-router-dom"
+import { useOverviewMutation } from "../../redux/rtkQuery/admin"
+import useHeaders from "@hooks/useHeaders"
 
 const Clinics = () => {
   const { t } = useTranslation()
+
   const navigate = useNavigate()
+  const headers = useHeaders()
+
   // ** State
   const [clinics, setClinics] = useState([])
   const [isFetching, setIsFetching] = useState(false)
@@ -81,7 +86,11 @@ const Clinics = () => {
       console.error('Error fetching clinics:', error)
     }
   }
+  const [overview, { data, isError }] = useOverviewMutation()
 
+  useEffect(() => {
+    overview({headers})
+  }, [])
   // ** Handle Filter Changes
   const handleFiltersChange = (newFilters) => {
     setFilters(newFilters)

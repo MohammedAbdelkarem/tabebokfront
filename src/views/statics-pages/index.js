@@ -23,6 +23,7 @@ import PrivacyPolices from './content/privacy'
 import Faq from './content/faq'
 import TOS from './content/tos'
 import LoadSpinner from '../../@core/components/spinner/loaders'
+import { useOverviewMutation } from '../../redux/rtkQuery/admin'
 
 const StaticPages = () => {
   const headers = useHeaders()
@@ -40,6 +41,11 @@ const StaticPages = () => {
     setActiveTab(tab)
     localStorage.setItem('activeStaticTab', tab)
   }
+  const [overview, { data, isError }] = useOverviewMutation()
+
+  useEffect(() => {
+    overview({headers})
+  }, [])
 
   useEffect(() => {
     switch (activeTab) {

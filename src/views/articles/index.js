@@ -38,8 +38,10 @@ import { useGetQuery as useCategoryQuery } from '../../redux/rtkQuery/content/ca
 
 
 import './articles.scss'
-
+import { useOverviewMutation } from '../../redux/rtkQuery/admin'
+import useHeaders from '@hooks/useHeaders'
 const Articles = () => {
+    const headers = useHeaders()
     const { t } = useTranslation()
     const [articles, setArticles] = useState([])
     const [currentPage, setCurrentPage] = useState(1)
@@ -53,9 +55,13 @@ const Articles = () => {
     const [showFilters, setShowFilters] = useState(false)
     const [selectedCategories, setSelectedCategories] = useState([])
     const [filterTimeout, setFilterTimeout] = useState(null)
-console.log('selectedCategories', selectedCategories);
+    const [overview, { data, isError }] = useOverviewMutation()
 
-
+    useEffect(() => {
+      overview({headers})
+    }, [])
+  
+  
     const [getArticles, { isLoading, error }] = useListMutation()
     const { data: categoriesData, isLoading: categoriesLoading } = useCategoryQuery({})
         const fetchArticles = useCallback(

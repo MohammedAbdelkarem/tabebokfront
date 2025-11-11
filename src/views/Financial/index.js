@@ -7,13 +7,23 @@ import LoadSpinner from "../../@core/components/spinner/loaders"
 import { Alert } from "reactstrap"
 import { useListMutation as fetchPlans } from "../../redux/rtkQuery/plan"
 import { useListMutation as fetchAddons } from "../../redux/rtkQuery/addons"
+import { useOverviewMutation } from "../../redux/rtkQuery/admin"
+import useHeaders from "@hooks/useHeaders"
 const FinancialManagement = () => {
+    const headers = useHeaders()
+
     const [fetchPlan, {data:plansData, isLoading:fetchingPlans}] = fetchPlans()    
     const [fetchAddon, {data:addonsData, isLoading:fetchingAddons}] = fetchAddons()
     useEffect(() => {
         fetchAddon()
         fetchPlan()
     }, [])
+    
+  const [overview, { data, isError }] = useOverviewMutation()
+
+  useEffect(() => {
+    overview({headers})
+  }, [])
     const isLoading = fetchingPlans || fetchingAddons
 
     return (

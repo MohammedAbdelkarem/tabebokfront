@@ -26,7 +26,8 @@ import { useNavigate } from 'react-router-dom'
 import SystemModal from '../components/systemModal'
 import SuccessAlert from '../components/handleStatusCode/success'
 import ErrorAlert from '../components/handleStatusCode/error'
-
+import useHeaders from '@hooks/useHeaders'
+import { useOverviewMutation } from '../../redux/rtkQuery/admin'
 const PlanActionsModal = ({ isOpen, toggle, onEdit, onDelete, onHide, selectedPlan }) => {
   return (
     <Modal isOpen={isOpen} toggle={toggle} centered>
@@ -51,6 +52,7 @@ const PlanActionsModal = ({ isOpen, toggle, onEdit, onDelete, onHide, selectedPl
 }
 const PlansManagement = () => {
   const {t} = useTranslation()
+  const headers = useHeaders()
   const navigate = useNavigate()
   const [modalOpen, setModalOpen] = useState(false)
   const [selectedPlan, setSelectedPlan] = useState(null)
@@ -58,7 +60,14 @@ const PlansManagement = () => {
   const [hideModal, setHideModal] = useState(false)
   // ** Method
   const [fetchPlan, {data:plansData, isLoading:fetchingPlans}] = useListMutation()  
-    const plans = plansData ? plansData.data : []  
+  const plans = plansData ? plansData.data : []  
+    
+  const [overview] = useOverviewMutation()
+
+  useEffect(() => {
+    overview({headers})
+  }, [])
+
     useEffect(() => {
         fetchPlan()
     }, [])

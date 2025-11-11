@@ -26,8 +26,15 @@ import LoadSpinner from "../../@core/components/spinner/loaders"
 import DescriptionCell from "../components/descriptionCell"
 import { useActionMutation, useFiltersMutation, useReportsMutation } from "../../redux/rtkQuery/report"
 import EmptyComponent from "../components/empty"
-
+import { useOverviewMutation } from "../../redux/rtkQuery/admin"
+import useHeaders from "@hooks/useHeaders"
 const ReportsManagement = () => {
+  const headers = useHeaders()
+  const [overview] = useOverviewMutation()
+
+  useEffect(() => {
+    overview({headers})
+  }, [])
   const [getReports, { data, isLoading }] = useReportsMutation()
   const reports = data?.data || []
   const [getFilters, { data:filterData, isLoading:filtering}] = useFiltersMutation()
