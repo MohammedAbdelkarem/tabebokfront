@@ -30,7 +30,7 @@ import { useListMutation } from "../../../redux/rtkQuery/plan"
 import { useCitiesQuery } from "../../../redux/rtkQuery/admin"
 
 // ** Google map imports
-import { GoogleMap, Marker, useLoadScript } from "@react-google-maps/api"
+import { GoogleMap, Marker, useLoadScript, Autocomplete } from "@react-google-maps/api"
 
 import { useGetQuery as useCategoriesQuery } from "../../../redux/rtkQuery/content/category"
 import { useGetMutation as useSubcatsMutation } from "../../../redux/rtkQuery/content/subCategory"
@@ -43,8 +43,9 @@ const ClinicForm = () => {
     height: "250px"
   }
   const { isLoaded } = useLoadScript({
-    id: 'google-map-script'
+    id: "google-map-script",
     // googleMapsApiKey: 'AIzaSyB-Cdn95koLl_dU9WZJywUcSV3xTZcvhe0'
+    libraries: ["places"]
   })
 
   const [errors, setErrors] = useState({})
@@ -130,6 +131,14 @@ const ClinicForm = () => {
     has_been_paid: "1",
     city_id: ""
   })
+
+  const [mapCenter, setMapCenter] = useState({
+    lat: Number(formData.lat) || 0,
+    lng: Number(formData.lng) || 0
+  })
+  const [autocompleteInstance, setAutocompleteInstance] = useState(null)
+  const [searchValue, setSearchValue] = useState("")
+  const [locating, setLocating] = useState(false)
 
   const validateField = (name, value) => {
     if (["full_name", "name", "clinic_name", "address_text"].includes(name)) {
@@ -334,6 +343,87 @@ const ClinicForm = () => {
       setSelectedCategoryIds(incomingSubCategories.map(String))
     }
   }, [state, defaultShift])
+
+  useEffect(() => {
+    const latNum = Number(formData.lat)
+    const lngNum = Number(formData.lng)
+    if (!isNaN(latNum) && !isNaN(lngNum)) {
+      setMapCenter({ lat: latNum, lng: lngNum })
+    }
+  }, [formData.lat, formData.lng])
+
+  const handleManualCenter = () => {
+    const latError = validateField("lat", formData.lat)
+    const lngError = validateField("lng", formData.lng)
+    setErrors((prev) => ({ ...prev, lat: latError, lng: lngError }))
+    if (!latError && !lngError) {
+      setMapCenter({ lat: Number(formData.lat), lng: Number(formData.lng) })
+    }
+  }
+
+  const handlePlaceChanged = () => {
+    if (!autocompleteInstance) return
+    const place = autocompleteInstance.getPlace()
+    const location = place?.geometry?.location
+    if (!location) return
+    const lat = location.lat()
+    const lng = location.lng()
+    setFormData((prev) => ({ ...prev, lat: String(lat), lng: String(lng) }))
+    setErrors((prev) => ({
+      ...prev,
+      lat: validateField("lat", String(lat)),
+      lng: validateField("lng", String(lng))
+    }))
+    setMapCenter({ lat, lng })
+    setSearchValue(place?.formatted_address || place?.name || "")
+  }
+
+  const handleLocateMe = () => {
+    if (!navigator?.geolocation) {
+      ErrorAlert({
+        title: t("Error"),
+        body: t("Geolocation is not supported by your browser"),
+        button: t("Done")
+      })
+      return
+    }
+    setLocating(true)
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const lat = position?.coords?.latitude
+        const lng = position?.coords?.longitude
+        if (lat === undefined || lng === undefined) {
+          setLocating(false)
+          ErrorAlert({
+            title: t("Error"),
+            body: t("Unable to fetch current location"),
+            button: t("Done")
+          })
+          return
+        }
+        const latStr = String(lat)
+        const lngStr = String(lng)
+        setFormData((prev) => ({ ...prev, lat: latStr, lng: lngStr }))
+        setErrors((prev) => ({
+          ...prev,
+          lat: validateField("lat", latStr),
+          lng: validateField("lng", lngStr)
+        }))
+        setMapCenter({ lat, lng })
+        setSearchValue("")
+        setLocating(false)
+      },
+      (err) => {
+        setLocating(false)
+        ErrorAlert({
+          title: t("Error"),
+          body: err?.message || t("Unable to fetch current location"),
+          button: t("Done")
+        })
+      },
+      { enableHighAccuracy: true }
+    )
+  }
 
   const handleSubmit = async () => {
     if (!runValidation()) return
@@ -791,8 +881,37 @@ const ClinicForm = () => {
                     <Label className='form-label'>
                         {t('Set the coordinates of the branch on the map')}
                     </Label>
+                    <Row className="mb-1">
+                      <Col md="12" className="mb-1">
+                        <Label className="form-label">{t("Coordinates (Lat, Lng)")}</Label>
+                        <InputGroup>
+                          <Input
+                            value={`${formData.lat}, ${formData.lng}`.trim()}
+                            onChange={(e) => {
+                              const [latInput = "", lngInput = ""] = e.target.value
+                                .split(",")
+                                .map(part => part.trim())
+                              setFormData(prev => ({
+                                ...prev,
+                                lat: latInput,
+                                lng: lngInput
+                              }))
+                            }}
+                            placeholder="33.518583, 36.279089"
+                          />
+                          <Button color="info" outline className="me-1" onClick={handleManualCenter}>
+                            {t("Go")}
+                          </Button>
+                          <Button color="primary" outline onClick={handleLocateMe} disabled={locating}>
+                            {locating ? <Spinner size="sm" /> : t("Use My Location")}
+                          </Button>
+                        </InputGroup>
+                        {errors?.lat && <div className="invalid-feedback d-block">{errors?.lat}</div>}
+                        {errors?.lng && <div className="invalid-feedback d-block">{errors?.lng}</div>}
+                      </Col>
+                    </Row>
                     <GoogleMap mapContainerStyle={containerStyle}
-                                center={{ lat: Number(formData.lat) || 0, lng: Number(formData.lng) || 0 }}
+                                center={mapCenter}
                                 zoom={15}
                                 id="map"
                                 onClick={(e) => {
@@ -805,9 +924,11 @@ const ClinicForm = () => {
                                       lat: validateField("lat", String(lat)),
                                       lng: validateField("lng", String(lng))
                                     }))
+                                    setMapCenter({ lat, lng })
+                                    setSearchValue("")
                                   }
                                 }}>
-                        <Marker position={{ lat: Number(formData.lat) || 0, lng: Number(formData.lng) || 0 }}/>
+                        <Marker position={mapCenter}/>
                     </GoogleMap>
                 
                   </Col>
