@@ -141,7 +141,7 @@ const ClinicForm = () => {
   const [locating, setLocating] = useState(false)
 
   const validateField = (name, value) => {
-    if (["full_name", "name", "clinic_name", "address_text"].includes(name)) {
+    if (["name", "clinic_name", "address_text"].includes(name)) {
       if (!value?.trim()) return t("This field is required")
     }
     if (name === "email") {
@@ -185,15 +185,18 @@ const ClinicForm = () => {
   }
 
   const runValidation = () => {
-    const newErr = {}
-    [
-      "full_name", "name", "clinic_name", "address_text", "email",
+    const newErr = Object.create(null)
+    const requiredFields = [
+      "name", "clinic_name", "address_text", "email",
       "phone_number", "lat", "lng", "birth_date",
       "is_male", "is_center", "has_been_paid", "plan_id", "city_id"
-    ]?.forEach((k) => {
+    ]
+
+    requiredFields.forEach((k) => {
       const e = validateField(k, formData[k])
       if (e) newErr[k] = e
     })
+
     const phoneNumbersRaw = formData?.phone_numbers
     let phoneNumbers = []
     if (Array.isArray(phoneNumbersRaw)) phoneNumbers = phoneNumbersRaw
@@ -240,8 +243,24 @@ const ClinicForm = () => {
       if (e) newErr[`shift_times.${idx}`] = e
     })
 
-    setErrors(newErr)
-    return Object.keys(newErr ?? {}).length === 0
+    const errorKeys = Object.keys(newErr)
+    setErrors(errorKeys.length > 0 ? newErr : {})
+    
+    if (errorKeys.length > 0) {
+      const firstErrorKey = errorKeys[0]
+      setTimeout(() => {
+        const firstErrorElement = document.querySelector(`[data-field-id="${firstErrorKey}"]`)
+        if (firstErrorElement) {
+          const scrollTarget = firstErrorElement.closest('.select__control') || firstErrorElement
+          scrollTarget.scrollIntoView({ behavior: "smooth", block: "center" })
+          if (firstErrorElement.focus && typeof firstErrorElement.focus === 'function') {
+            firstErrorElement.focus()
+          }
+        }
+      }, 100)
+    }
+
+    return errorKeys.length === 0
   }
 
   const setField = (name, value) => {
@@ -426,51 +445,75 @@ const ClinicForm = () => {
   }
 
   const handleSubmit = async () => {
-    if (!runValidation()) return
-
-    const payload = new FormData()
-
-    payload.append("full_name", '')
-    payload.append("name", formData.name)
-    if (formData.doctor) payload.append("doctor", formData.doctor)
-    if (formData.pergl) payload.append("pergl", formData.pergl)
-    payload.append("phone_number", formData.phone_number)
-    payload.append("birth_date", typeof formData.birth_date === "string" ? formData.birth_date : new Date(formData.birth_date).toISOString().slice(0, 10))
-    payload.append("email", formData.email)
-    payload.append("is_male", String(formData.is_male))
-
-    if (formData.avatar) payload.append("avatar", formData.avatar)
-
-    payload.append("clinic_name", formData.clinic_name)
-    payload.append("address_text", formData.address_text)
-    payload.append("lat", String(formData.lat))
-    payload.append("lng", String(formData.lng))
-    if (formData.license_number) payload.append("license_number", formData.license_number)
-    payload.append("is_center", String(formData.is_center))
-    if (formData.bio) payload.append("bio", formData.bio)
-    if (formData.join_reason) payload.append("join_reason", formData.join_reason)
-
-    if (formData.logo) payload.append("logo", formData.logo)
-    if (formData.cover_image) payload.append("cover_image", formData.cover_image)
-    formData.certificates.forEach((c, i) => {
-      if (c.image) payload.append(`certificates[${i}][image]`, c.image)
-      if (c.title) payload.append(`certificates[${i}][title]`, c.title)
-    })
-    formData.phone_numbers.forEach((p) => payload.append("phone_numbers[]", p))
-
-    formData.sub_category_ids.forEach((sid) => payload.append("sub_category_ids[]", sid))
-
-    formData.shift_times.forEach((st, i) => {
-      payload.append(`shift_times[${i}][day_id]`, String(st.day_id))
-      payload.append(`shift_times[${i}][start_time]`, st.start_time)
-      payload.append(`shift_times[${i}][end_time]`, st.end_time)
-    })
-
-    payload.append("plan_id", String(formData.plan_id))
-    payload.append("has_been_paid", String(formData.has_been_paid))
-    payload.append("city_id", String(formData.city_id))
+    const isValid = runValidation()
+    if (!isValid) {
+      ErrorAlert({
+        title: t("Validation Error"),
+        body: t("Please fill all required fields correctly"),
+        button: t("Done")
+      })
+      return
+    }
 
     try {
+      const payload = new FormData()
+
+      payload.append("full_name", '')
+      payload.append("name", formData.name || '')
+      if (formData.doctor) payload.append("doctor", formData.doctor)
+      if (formData.pergl) payload.append("pergl", formData.pergl)
+      payload.append("phone_number", formData.phone_number || '')
+      
+      const birthDate = formData.birth_date ? (typeof formData.birth_date === "string" ? formData.birth_date : new Date(formData.birth_date).toISOString().slice(0, 10)) : ""
+      payload.append("birth_date", birthDate)
+      payload.append("email", formData.email || '')
+      payload.append("is_male", String(formData.is_male || "1"))
+
+      if (formData.avatar) payload.append("avatar", formData.avatar)
+
+      payload.append("clinic_name", formData.clinic_name || '')
+      payload.append("address_text", formData.address_text || '')
+      payload.append("lat", String(formData.lat || "33.518583"))
+      payload.append("lng", String(formData.lng || "36.279089"))
+      if (formData.license_number) payload.append("license_number", formData.license_number)
+      payload.append("is_center", String(formData.is_center || "1"))
+      if (formData.bio) payload.append("bio", formData.bio)
+      if (formData.join_reason) payload.append("join_reason", formData.join_reason)
+
+      if (formData.logo) payload.append("logo", formData.logo)
+      if (formData.cover_image) payload.append("cover_image", formData.cover_image)
+      
+      if (Array.isArray(formData.certificates)) {
+        formData.certificates.forEach((c, i) => {
+          if (c?.image) payload.append(`certificates[${i}][image]`, c.image)
+          if (c?.title) payload.append(`certificates[${i}][title]`, c.title)
+        })
+      }
+      
+      if (Array.isArray(formData.phone_numbers)) {
+        formData.phone_numbers.forEach((p) => {
+          if (p) payload.append("phone_numbers[]", p)
+        })
+      }
+
+      if (Array.isArray(formData.sub_category_ids)) {
+        formData.sub_category_ids.forEach((sid) => {
+          if (sid) payload.append("sub_category_ids[]", sid)
+        })
+      }
+
+      if (Array.isArray(formData.shift_times)) {
+        formData.shift_times.forEach((st, i) => {
+          if (st?.day_id) payload.append(`shift_times[${i}][day_id]`, String(st.day_id))
+          if (st?.start_time) payload.append(`shift_times[${i}][start_time]`, st.start_time)
+          if (st?.end_time) payload.append(`shift_times[${i}][end_time]`, st.end_time)
+        })
+      }
+
+      payload.append("plan_id", String(formData.plan_id || ''))
+      payload.append("has_been_paid", String(formData.has_been_paid || "1"))
+      payload.append("city_id", String(formData.city_id || ''))
+
       await store({ body: payload }).unwrap()
       SuccessAlert({
         title: t("Success"),
@@ -479,9 +522,10 @@ const ClinicForm = () => {
       })
       navigate(-1)
     } catch (error) {
+      console.error("Submit error:", error)
       ErrorAlert({
         title: t("Error"),
-        body: error?.data?.message || storeError?.data?.message || t("Something went wrong"),
+        body: error?.data?.message || storeError?.data?.message || error?.message || t("Something went wrong"),
         button: t("Done")
       })
     }
@@ -522,6 +566,7 @@ const ClinicForm = () => {
                   <Col md="4" className="mb-2">
                     <Label className="form-label">{t("Name")}</Label>
                     <Input
+                      data-field-id="name"
                       value={formData.name}
                       onChange={(e) => setField("name", e.target.value)}
                     />
@@ -530,6 +575,7 @@ const ClinicForm = () => {
                   <Col md="4" className="mb-2">
                     <Label className="form-label">{t("Phone Number")}</Label>
                     <Input
+                      data-field-id="phone_number"
                       value={formData.phone_number}
                       onChange={(e) => setField("phone_number", e.target.value)}
                       placeholder="+963937139393"
@@ -540,6 +586,7 @@ const ClinicForm = () => {
                   <Col md="4" className="mb-2">
                     <Label className="form-label">{t("Email")}</Label>
                     <Input
+                      data-field-id="email"
                       type="email"
                       value={formData.email}
                       onChange={(e) => setField("email", e.target.value)}
@@ -551,6 +598,7 @@ const ClinicForm = () => {
                   <Col md="4" className="mb-2">
                     <Label className="form-label">{t("Birth Date")}</Label>
                     <Flatpickr
+                      data-field-id="birth_date"
                       value={formData.birth_date ? new Date(formData.birth_date) : null}
                       options={{ dateFormat: "Y-m-d" }}
                       onChange={(date) => setField("birth_date", date?.[0] ? date[0].toISOString().slice(0, 10) : "")
@@ -598,6 +646,7 @@ const ClinicForm = () => {
                   <Col md="4" className="mb-2">
                     <Label className="form-label">{t("Clinic Name")}</Label>
                     <Input
+                      data-field-id="clinic_name"
                       value={formData.clinic_name}
                       onChange={(e) => setField("clinic_name", e.target.value)}
                     />
@@ -674,6 +723,7 @@ const ClinicForm = () => {
                     <Label className="form-label">{t("Sub Categories")}</Label>
                       <Select
                         classNamePrefix="select"
+                        data-field-id="sub_category_ids"
                         isMulti
                         isDisabled={!selectedCategoryIds.length}
                         isLoading={loadingSubcats}
@@ -716,6 +766,7 @@ const ClinicForm = () => {
                         <Col md="6" className="mb-1">
                           <Label className="form-label">{t("Certificate Image")}</Label>
                           <Input
+                            data-field-id={`certificates.${idx}.image`}
                             type="file"
                             accept="image/*"
                             onChange={(e) => onCertImage(idx, e.target.files?.[0])}
@@ -727,6 +778,7 @@ const ClinicForm = () => {
                         <Col md="6" className="mb-1">
                           <Label className="form-label">{t("Certificate Title")}</Label>
                           <Input
+                            data-field-id={`certificates.${idx}.title`}
                             value={c.title}
                             onChange={(e) => onCertTitle(idx, e.target.value)}
                           />
@@ -756,6 +808,7 @@ const ClinicForm = () => {
                         <InputGroup>
                           <InputGroupText>+ / 0</InputGroupText>
                           <Input
+                            data-field-id={`phone_numbers.${idx}`}
                             value={p}
                             onChange={(e) => onPhoneChange(idx, e.target.value)}
                             placeholder="0948xxxxxxx"
@@ -779,7 +832,7 @@ const ClinicForm = () => {
                 <h5 className="mb-1">{t("Shift Times")}</h5>
                 <Row className="mb-2">
                   {formData.shift_times.map((st, idx) => (
-                    <Col md="12" className="border rounded p-1 mb-1" key={`shift-${idx}`}>
+                    <Col md="12" className="border rounded p-1 mb-1" key={`shift-${idx}`} data-field-id={`shift_times.${idx}`}>
                       <Row className="align-items-end">
                         <Col md="4" className="mb-1">
                           <Label className="form-label">{t("Day ID")}</Label>
@@ -833,6 +886,7 @@ const ClinicForm = () => {
                     <Label className="form-label">{t("Plan")}</Label>
                     <Select
                       classNamePrefix="select"
+                      data-field-id="plan_id"
                       isLoading={loadingPlans}
                       options={planOptions}
                       value={planOptions.find(o => String(o.value) === String(formData.plan_id)) || null}
@@ -862,6 +916,7 @@ const ClinicForm = () => {
                     <Label className="form-label">{t("City")}</Label>
                     <Select
                       classNamePrefix="select"
+                      data-field-id="city_id"
                       isLoading={loadingCities}
                       options={cityOptions}
                       value={cityOptions.find(o => String(o.value) === String(formData.city_id)) || null}
@@ -872,6 +927,7 @@ const ClinicForm = () => {
                     {errors?.city_id && <div className="invalid-feedback d-block">{errors?.city_id}</div>}
                     <Label className="form-label mt-2">{t("Address Text")}</Label>
                     <Input
+                      data-field-id="address_text"
                       value={formData.address_text}
                       onChange={(e) => setField("address_text", e.target.value)}
                     />
@@ -886,6 +942,7 @@ const ClinicForm = () => {
                         <Label className="form-label">{t("Coordinates (Lat, Lng)")}</Label>
                         <InputGroup>
                           <Input
+                            data-field-id="lat"
                             value={`${formData.lat}, ${formData.lng}`.trim()}
                             onChange={(e) => {
                               const [latInput = "", lngInput = ""] = e.target.value
