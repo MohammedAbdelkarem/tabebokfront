@@ -599,10 +599,9 @@ const ClinicForm = () => {
                     <Label className="form-label">{t("Birth Date")}</Label>
                     <Flatpickr
                       data-field-id="birth_date"
-                      value={formData.birth_date ? new Date(formData.birth_date) : null}
+                      value={formData.birth_date || ""}
                       options={{ dateFormat: "Y-m-d" }}
-                      onChange={(date) => setField("birth_date", date?.[0] ? date[0].toISOString().slice(0, 10) : "")
-                      }
+                      onChange={(_, dateStr) => setField("birth_date", dateStr || "")}
                       className="form-control"
                     />
                     {errors?.birth_date && <div className="invalid-feedback d-block">{errors?.birth_date}</div>}
